@@ -11,7 +11,7 @@ void displaySongs();   // Displays all songs currently in the playlist
 void searchSong();     // Searches for a song by title (or partial title)
 void showMenu();       // Displays the menu options to the user
 int getChoice();       // Gets and returns the user's menu choice
-void displayStats(); // Display statistics (average song length, total playlist duration, average song length, longest song, shortest song)
+void displayStats(); // Displays playlist statistics (total songs, total duration, average length, longest and shortest song)
 
 
 
