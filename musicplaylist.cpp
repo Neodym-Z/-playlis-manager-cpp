@@ -1,5 +1,18 @@
 #include <iostream>
+#include <cctype>
+#include <string>
 using namespace std;
+
+
+// ===== Global Constants =====
+const int MAX = 100;
+
+// ===== Global Parallel Arrays =====
+string songTitle[MAX];
+string artist[MAX];
+float duration[MAX];
+
+int songAmount = 0;
 
 // ===== Function Prototypes =====
 // These declare the functions before main()
@@ -59,4 +72,10 @@ int main()
     } while (choice != 0); // Exit loop when user selects 0
 
     return 0; // End of program
+}
+
+void searchSong()
+{
+    string query;
+    bool found = false;
 }
