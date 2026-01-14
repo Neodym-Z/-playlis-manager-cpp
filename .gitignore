@@ -1,5 +1,12 @@
+# Compiled files
 *.exe
 *.out
 *.o
 *.obj
+
+# VS Code
 .vscode/
+tempCodeRunnerFile.cpp
+
+# OS junk
+Thumbs.db
