@@ -10,7 +10,7 @@ const int MAX = 100;
 // ===== Global Parallel Arrays =====
 string songTitle[MAX];
 string artist[MAX];
-float duration[MAX];
+string duration[MAX];
 
 int songAmount = 0;
 
@@ -39,7 +39,6 @@ void displayStats(); // Displays playlist statistics (total songs, total duratio
     - Song duration
     - Album name
     - Playlist name
-    - Playlist description
 
     PROCESS:
     - Create playlist
@@ -76,6 +75,40 @@ int main()
 
 void searchSong()
 {
-    string query;
-    bool found = false;
+    if (songAmount == 0)
+    {
+        cout << "Playlist is Empty. Cannot search for a song." << endl;
+        return;
+    }
+    
+    char choice;
+
+    do {
+         string query;
+         bool found = false;
+
+         cout << "Enter the song title to search: " << endl;
+         getline(cin >> ws, query);
+
+         for (int i = 0; i < songAmount; i++)
+         {
+            if (songTitle[i].find(query) != string::npos)
+            {
+                cout << i + 1 << ". " << songTitle[i] << " - " << artist[i] << " (" << duration[i] << ")" << endl;
+                // ex: Creep - Radiohead (4:21)
+                found = true;
+            }
+         }
+
+         if (!found)
+         {
+            cout << "No Matching Songs found." << endl;
+         }
+
+         cout << "Search Again? (Y/N)";
+         cin >> choice;
+         cin.ignore();
+
+    } while (toupper(choice) == 'Y');
+
 }
