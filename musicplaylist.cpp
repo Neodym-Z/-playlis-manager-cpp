@@ -13,19 +13,20 @@ string artist[MAX];
 string duration[MAX];
 
 int songAmount = 0;
+string playlistTitle, playlistDescription;
 // ===== Function Prototypes =====
 // These declare the functions before main()
 // so main() knows they exist (modularity moment)
 
 void addSong();        // Adds a new song to the playlist
 void removeSong();     // Removes a song from the playlist
-void displayPlaylist(string, string);   // Displays all songs currently in the playlist
+void displayPlaylist();   // Displays all songs currently in the playlist
 void searchSong();     // Searches for a song by title (or partial title)
 void showMenu();       // Displays the menu options to the user
 int getChoice();       // Gets and returns the user's menu choice
 void displayStats(); // Displays playlist statistics (total songs, total duration, average length, longest and shortest song)
-void showWelcome(); // show the welcome message
-void createPlaylist(string&, string&); // allows the user to create the playlist (entering their title and description)
+void displayWelcome(); // show the welcome message
+void createPlaylist(); // allows the user to create the playlist (entering their title and description)
 
 
 
@@ -55,11 +56,10 @@ void createPlaylist(string&, string&); // allows the user to create the playlist
 
 int main()
 {
-    int choice; // Stores the user's menu choice
-    string playlistTitle, playlistDescription;
+    int choice;
     system("chcp 65001 > nul"); // Sets Windows console to UTF-8 for proper ASCII display
     displayWelcome();
-    createPlaylist(playlistTitle, playlistDescription);
+    createPlaylist();
 
     // Loop keeps running until user chooses to exit (choice == 0)
     do {
@@ -70,7 +70,7 @@ int main()
         if (choice == 1) addSong();
         else if (choice == 2) removeSong();
         else if (choice == 3) searchSong();
-        else if (choice == 4) displayPlaylist(playlistTitle, playlistDescription);
+        else if (choice == 4) displayPlaylist();
         else if (choice == 5) displayStats();
 
     } while (choice != 0); // Exit loop when user selects 0
@@ -80,7 +80,7 @@ int main()
 
 void showMenu()
 {
-    // shows the menu for the user to choose 
+    // shows the menu for the user to choose from
     cout << "\n========== MENU ==========\n";
     cout << "1. Add Song\n";
     cout << "2. Remove Song\n";
@@ -93,6 +93,7 @@ void showMenu()
 
 void displayWelcome()
 {
+    // displays a welcome message for the user
     cout << "\n";
     cout << "  ███╗   ███╗██╗   ██╗███████╗██╗ ██████╗\n";
     cout << "  ████╗ ████║██║   ██║██╔════╝██║██╔════╝\n";
@@ -105,21 +106,104 @@ void displayWelcome()
     cout << "\n";
 }
 
-void createPlaylist(string& title, string& description)
+int getChoice()
 {
+    // To take user choice based on the menu 
+    int choice;
+    cout << "Enter your choice (1-5)/ '0' to exit: " << endl;
+    cin >> choice;
+    cin.ignore();
+    return choice;
+}
+
+void createPlaylist()
+{
+    // prompts the user to create the playlist by entering their playlist name and the description
     cout << "♪♫ Name your playlist: " << endl;
-    getline(cin >> ws, title);
+    getline(cin >> ws, playlistTitle);
     cout << "Add a description to set the vibe: " << endl;
-    getline(cin >> ws, description);
+    getline(cin >> ws, playlistDescription);
     cout << endl;
 }
 
-void displayPlaylist(string title, string description)
+void addSong()
+{
+    // allows users to add songs repeatedly until they exit.
+    char choice;
+   do {
+     if (songAmount >= MAX)
+    {
+        cout << "Playlist is full! Cannot add more songs." << endl;
+        return;
+    }
+    cout << "Enter song title: ";
+    getline(cin >> ws, songTitle[songAmount]);
+
+    cout << "Enter artist name: "; 
+    getline(cin >> ws, artist[songAmount]);
+
+    cout << "Enter duration (MM:SS) [ex: (3:56)]: ";
+    getline(cin >> ws, duration[songAmount]);
+
+    songAmount++;
+    cout << "Song added successfully!" << endl;
+    cout << "Add another song? (Y/N): ";
+    cin >> choice;
+    cin.ignore();
+   } while (toupper(choice) == 'Y');
+}
+
+void removeSong()
+{
+    if (songAmount == 0)
+    {
+        cout << "There are no songs to delete." << endl;
+        return;
+    }
+    
+
+    int choice;
+    char removeAgain;
+
+    do {
+        displayPlaylist();
+        cout << "Enter the song number to delete: ";
+        cin >> choice;
+        cin.ignore();
+
+        int index = choice - 1;
+
+        if (index < 0 || index >= songAmount)
+        {
+            cout << "Invalid song number" << endl;
+            continue;
+        }
+
+        for (int i = index; i < songAmount - 1; i++)
+        {
+            songTitle[i] = songTitle[i+1];
+            artist[i] = artist[i+1];
+            duration[i] = duration[i+1];
+        }
+        songAmount--;
+        cout << "Song deleted successfully!" << endl;
+        cout << "Remove another song? (Y/N): ";
+        cin >> removeAgain;
+        cin.ignore();
+    } while (toupper(removeAgain) == 'Y');
+}
+
+void displayPlaylist()
 {
     // displays the contents of the playlist(ex: title, description, each song and it's contents)
-    cout << title << endl;
+    if (songAmount == 0)
+    {
+        cout << "Playlist is empty! Add some songs first." << endl;
+        return;
+    }
+    cout << playlistTitle << endl;
     cout << "---------------------------------------------------------" << endl;
-    cout << description << endl;
+    cout << playlistDescription << endl;
     cout << "=========================================================" << endl;
     for (int i = 0; i < songAmount; i++)
     {
@@ -132,6 +216,7 @@ void displayPlaylist(string title, string description)
 
 void searchSong()
 {
+    // allows user to search for a specific song inside the playlist
     if (songAmount == 0)
     {
         cout << "Playlist is Empty. Cannot search for a song." << endl;
@@ -162,10 +247,9 @@ void searchSong()
             cout << "No Matching Songs found." << endl;
          }
 
-         cout << "Search Again? (Y/N)";
+         cout << "Search Again? (Y/N): ";
          cin >> choice;
          cin.ignore();
 
     } while (toupper(choice) == 'Y');
-
 }
