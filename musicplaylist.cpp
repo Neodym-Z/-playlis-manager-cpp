@@ -27,6 +27,7 @@ int getChoice();       // Gets and returns the user's menu choice
 void displayStats(); // Displays playlist statistics (total songs, total duration, average length, longest and shortest song)
 void displayWelcome(); // show the welcome message
 void createPlaylist(); // allows the user to create the playlist (entering their title and description)
+int durationToSeconds(string); // a helper function to parse the string(duration) into minutes and seconds so that we can use as an integer for duration calculations
 
 
 
@@ -45,11 +46,12 @@ void createPlaylist(); // allows the user to create the playlist (entering their
     PROCESS:
     - Create playlist
     - Add song to playlist
-    - Remove song from playlist
+    - Remove song to playlist
     - Search for a song in the playlist
 
     OUTPUT:
     - Display playlist contents
+    - Display statistics
     - Display search results
 */
 
@@ -65,6 +67,10 @@ int main()
     do {
         showMenu();           // Display menu options
         choice = getChoice(); // Get user's choice
+        if (choice == -1)
+        {
+            cout << "Invalid input. Please enter a number.\n";
+        }
 
         // Call functions based on user choice
         if (choice == 1) addSong();
@@ -74,6 +80,7 @@ int main()
         else if (choice == 5) displayStats();
 
     } while (choice != 0); // Exit loop when user selects 0
+    cout << "We'll see you later!" << endl;
 
     return 0; // End of program
 }
@@ -108,21 +115,26 @@ void displayWelcome()
 
 int getChoice()
 {
-    // To take user choice based on the menu 
     int choice;
-    cout << "Enter your choice (1-5)/ '0' to exit: " << endl;
-    cin >> choice;
-    cin.ignore();
+    cout << "Enter your choice: ";
+    if (!(cin >> choice)) { // If user enters a letter
+        cin.clear();
+        cin.ignore(1000, '\n');
+        return -1;
+    }
+    cin.ignore(1000, '\n'); // Clean up the newline for the next function
     return choice;
 }
 
 void createPlaylist()
 {
     // prompts the user to create the playlist by entering their playlist name and the description
+    cout << "\n";
     cout << "♪♫ Name your playlist: " << endl;
-    getline(cin >> ws, playlistTitle);
+    getline(cin, playlistTitle);
+    cout << "\n";
     cout << "Add a description to set the vibe: " << endl;
-    getline(cin >> ws, playlistDescription);
+    getline(cin, playlistDescription);
     cout << endl;
 }
 
@@ -130,27 +142,33 @@ void addSong()
 {
     // allows users to add songs repeatedly until they exit.
     char choice;
-   do {
-     if (songAmount >= MAX)
-    {
-        cout << "Playlist is full! Cannot add more songs." << endl;
-        return;
-    }
-    cout << "Enter song title: ";
-    getline(cin >> ws, songTitle[songAmount]);
+    do {
+        if (songAmount >= MAX)
+        {
+            cout << "Playlist is full! Cannot add more songs." << endl;
+            return;
+        }
+        cout << "Enter song title: ";
+        getline(cin, songTitle[songAmount]);
 
-    cout << "Enter artist name: "; 
-    getline(cin >> ws, artist[songAmount]);
+        cout << "Enter artist name: ";
+        getline(cin, artist[songAmount]);
 
-    cout << "Enter duration (MM:SS) [ex: (3:56)]: ";
-    getline(cin >> ws, duration[songAmount]);
+        do {
+            cout << "Enter duration (MM:SS) [ex: 3:56]: ";
+            getline(cin, duration[songAmount]);
 
-    songAmount++;
-    cout << "Song added successfully!" << endl;
-    cout << "Add another song? (Y/N): ";
-    cin >> choice;
-    cin.ignore();
-   } while (toupper(choice) == 'Y');
+            if (durationToSeconds(duration[songAmount]) == -1)
+                cout << "Invalid format. Please use MM:SS (seconds < 60).\n";
+
+        } while (durationToSeconds(duration[songAmount]) == -1);
+
+        songAmount++;
+        cout << "Song added successfully!" << endl;
+        cout << "Add another song? (Y/N): ";
+        cin >> choice;
+        cin.ignore(1000, '\n');
+    } while (toupper(choice) == 'Y');
 }
 
 void removeSong()
@@ -160,7 +178,6 @@ void removeSong()
         cout << "There are no songs to delete." << endl;
         return;
     }
-    
 
     int choice;
     char removeAgain;
@@ -181,15 +198,15 @@ void removeSong()
 
         for (int i = index; i < songAmount - 1; i++)
         {
-            songTitle[i] = songTitle[i+1];
-            artist[i] = artist[i+1];
-            duration[i] = duration[i+1];
+            songTitle[i] = songTitle[i + 1];
+            artist[i] = artist[i + 1];
+            duration[i] = duration[i + 1];
         }
         songAmount--;
         cout << "Song deleted successfully!" << endl;
         cout << "Remove another song? (Y/N): ";
         cin >> removeAgain;
-        cin.ignore();
+        cin.ignore(1000, '\n');
     } while (toupper(removeAgain) == 'Y');
 }
 
@@ -210,9 +227,9 @@ void displayPlaylist()
         cout << i + 1 << ". " << songTitle[i] << " - " << artist[i] << " (" << duration[i] << ")" << endl;
     }
     cout << "=========================================================" << endl;
+    cout << "\nPress Enter to return to menu...";
+    cin.get();
 }
-
-
 
 void searchSong()
 {
@@ -222,34 +239,110 @@ void searchSong()
         cout << "Playlist is Empty. Cannot search for a song." << endl;
         return;
     }
-    
+
     char choice;
 
     do {
-         string query;
-         bool found = false;
+        string query;
+        bool found = false;
 
-         cout << "Enter the song title to search: " << endl;
-         getline(cin >> ws, query);
+        cout << "Enter the song title to search: " << endl;
+        getline(cin, query);
 
-         for (int i = 0; i < songAmount; i++)
-         {
+        for (int i = 0; i < songAmount; i++)
+        {
             if (songTitle[i].find(query) != string::npos)
             {
                 cout << i + 1 << ". " << songTitle[i] << " - " << artist[i] << " (" << duration[i] << ")" << endl;
-                // ex: Creep - Radiohead (4:21)
                 found = true;
             }
-         }
+        }
 
-         if (!found)
-         {
+        if (!found)
+        {
             cout << "No Matching Songs found." << endl;
-         }
+        }
 
-         cout << "Search Again? (Y/N): ";
-         cin >> choice;
-         cin.ignore();
-
+        cout << "Search Again? (Y/N): ";
+        cin >> choice;
+        cin.ignore(1000, '\n');
+        
     } while (toupper(choice) == 'Y');
+}
+
+int durationToSeconds(string dur)
+{
+    int colonPos = dur.find(':');
+    if (colonPos == string::npos) return -1;
+
+    int minutes = stoi(dur.substr(0, colonPos));
+    int seconds = stoi(dur.substr(colonPos + 1));
+
+    if (seconds >= 60) return -1;
+
+    return minutes * 60 + seconds;
+}
+
+void displayStats()
+{
+    // 1. Error check: Don't calculate if empty
+    if (songAmount == 0)
+    {
+        cout << "No songs to display statistics for." << endl;
+        return;
+    }
+
+    int totalSeconds = 0;
+    int shortestIdx = 0;
+    int longestIdx = 0;
+
+    int maxSecs = durationToSeconds(duration[0]);
+    int minSecs = maxSecs;
+
+    for (int i = 0; i < songAmount; i++)
+    {
+        int secs = durationToSeconds(duration[i]);
+        totalSeconds += secs;
+
+        if (secs > maxSecs)
+        {
+            maxSecs = secs;
+            longestIdx = i;
+        }
+
+        if (secs < minSecs)
+        {
+            minSecs = secs;
+            shortestIdx = i;
+        }
+    }
+
+    int hours = totalSeconds / 3600;
+    int minutes = (totalSeconds % 3600) / 60;
+    int seconds = totalSeconds % 60;
+
+    int avgSeconds = totalSeconds / songAmount;
+    int avgH = avgSeconds / 3600;
+    int avgM = (avgSeconds % 3600) / 60;
+    int avgS = avgSeconds % 60;
+
+    cout << "\n========== PLAYLIST STATISTICS ==========\n";
+    cout << "Total Songs: " << songAmount << endl;
+
+    cout << "Total Duration: ";
+    if (hours > 0) cout << hours << "h ";
+    if (minutes > 0) cout << minutes << "m ";
+    cout << seconds << "s" << endl;
+
+    cout << "Average Song Length: ";
+    if (avgH > 0) cout << avgH << "h ";
+    if (avgM > 0 || avgH > 0) cout << avgM << "m ";
+    cout << avgS << "s" << endl;
+
+    cout << "Longest Song: " << songTitle[longestIdx] << " - " << artist[longestIdx] << " (" << duration[longestIdx] << ")" << endl;
+    cout << "Shortest Song: " << songTitle[shortestIdx] << " - " << artist[shortestIdx] << " (" << duration[shortestIdx] << ")" << endl;
+    cout << "=========================================\n";
+
+    cout << "\nPress Enter to return to menu...";
+    cin.get();
 }
