@@ -273,14 +273,25 @@ void searchSong()
 int durationToSeconds(string dur)
 {
     int colonPos = dur.find(':');
-    if (colonPos == string::npos) return -1;
 
-    int minutes = stoi(dur.substr(0, colonPos));
-    int seconds = stoi(dur.substr(colonPos + 1));
+    // Format check: Ensures colon exists and isn't at the boundaries
+    if (colonPos == string::npos || colonPos == 0 || colonPos == dur.length() - 1) 
+        return -1;
 
+    // Split string into MM and SS components based on colon index
+    string minsStr = dur.substr(0, colonPos);
+    string secsStr = dur.substr(colonPos + 1);
+
+    // prevent stoi() from crashing on non-numeric input
+    for (char c : minsStr) if (!isdigit(c)) return -1;
+    for (char c : secsStr) if (!isdigit(c)) return -1;
+
+    int minutes = stoi(minsStr);
+    int seconds = stoi(secsStr);
+
+    // Final validation and conversion to total seconds
     if (seconds >= 60) return -1;
-
-    return minutes * 60 + seconds;
+    return (minutes * 60) + seconds;
 }
 
 void displayStats()
