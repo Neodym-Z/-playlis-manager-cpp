@@ -46,7 +46,7 @@ int durationToSeconds(string); // a helper function to parse the string(duration
     PROCESS:
     - Create playlist
     - Add song to playlist
-    - Remove song to playlist
+    - Remove song from playlist
     - Search for a song in the playlist
 
     OUTPUT:
@@ -266,7 +266,7 @@ void searchSong()
         cout << "Search Again? (Y/N): ";
         cin >> choice;
         cin.ignore(1000, '\n');
-        
+
     } while (toupper(choice) == 'Y');
 }
 
